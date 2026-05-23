@@ -1,8 +1,8 @@
 import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PRANAYAMA_EXERCISES, MEDITATIONS, MORNING_ROUTINE } from '@/data/yoga';
+import { useStorage } from '@/hooks/useStorage';
 
 const styles = StyleSheet.create({
   container: {
@@ -131,6 +131,7 @@ export default function HomeScreen() {
   const [practiceCount, setPracticeCount] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [lastPractice, setLastPractice] = useState<string | null>(null);
+  const storage = useStorage();
 
   useEffect(() => {
     loadStats();
@@ -138,9 +139,9 @@ export default function HomeScreen() {
 
   const loadStats = async () => {
     try {
-      const count = await AsyncStorage.getItem('practiceCount');
-      const streak = await AsyncStorage.getItem('currentStreak');
-      const last = await AsyncStorage.getItem('lastPractice');
+      const count = await storage.getItem('practiceCount');
+      const streak = await storage.getItem('currentStreak');
+      const last = await storage.getItem('lastPractice');
 
       setPracticeCount(count ? parseInt(count) : 0);
       setCurrentStreak(streak ? parseInt(streak) : 0);
@@ -152,7 +153,7 @@ export default function HomeScreen() {
 
   const startPractice = async () => {
     const today = new Date().toDateString();
-    const last = await AsyncStorage.getItem('lastPractice');
+    const last = await storage.getItem('lastPractice');
 
     const newCount = practiceCount + 1;
     let newStreak = currentStreak + 1;
@@ -163,9 +164,9 @@ export default function HomeScreen() {
       if (daysDiff > 1) newStreak = 1;
     }
 
-    await AsyncStorage.setItem('practiceCount', String(newCount));
-    await AsyncStorage.setItem('currentStreak', String(newStreak));
-    await AsyncStorage.setItem('lastPractice', today);
+    await storage.setItem('practiceCount', String(newCount));
+    await storage.setItem('currentStreak', String(newStreak));
+    await storage.setItem('lastPractice', today);
 
     setPracticeCount(newCount);
     setCurrentStreak(newStreak);

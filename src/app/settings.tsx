@@ -1,7 +1,7 @@
 import { ScrollView, TouchableOpacity, View, Text, StyleSheet, Switch, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useStorage } from '@/hooks/useStorage';
 
 const styles = StyleSheet.create({
   container: {
@@ -144,6 +144,7 @@ export default function SettingsScreen() {
   const [practiceCount, setPracticeCount] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [musicEnabled, setMusicEnabled] = useState(false);
+  const storage = useStorage();
 
   useEffect(() => {
     loadSettings();
@@ -151,11 +152,11 @@ export default function SettingsScreen() {
 
   const loadSettings = async () => {
     try {
-      const reminders = await AsyncStorage.getItem('remindersEnabled');
-      const time = await AsyncStorage.getItem('reminderTime');
-      const count = await AsyncStorage.getItem('practiceCount');
-      const streak = await AsyncStorage.getItem('currentStreak');
-      const music = await AsyncStorage.getItem('musicEnabled');
+      const reminders = await storage.getItem('remindersEnabled');
+      const time = await storage.getItem('reminderTime');
+      const count = await storage.getItem('practiceCount');
+      const streak = await storage.getItem('currentStreak');
+      const music = await storage.getItem('musicEnabled');
 
       setRemindersEnabled(reminders === 'true');
       setReminderTime(time || '06:30');
@@ -169,17 +170,17 @@ export default function SettingsScreen() {
 
   const toggleReminders = async (value: boolean) => {
     setRemindersEnabled(value);
-    await AsyncStorage.setItem('remindersEnabled', String(value));
+    await storage.setItem('remindersEnabled', String(value));
   };
 
   const toggleMusic = async (value: boolean) => {
     setMusicEnabled(value);
-    await AsyncStorage.setItem('musicEnabled', String(value));
+    await storage.setItem('musicEnabled', String(value));
   };
 
   const resetStats = async () => {
-    await AsyncStorage.setItem('practiceCount', '0');
-    await AsyncStorage.setItem('currentStreak', '0');
+    await storage.setItem('practiceCount', '0');
+    await storage.setItem('currentStreak', '0');
     setPracticeCount(0);
     setCurrentStreak(0);
   };
